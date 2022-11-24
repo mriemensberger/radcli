@@ -522,3 +522,19 @@ int rc_send_server_ctx(rc_handle * rh, RC_AAA_CTX ** ctx, SEND_DATA * data,
 
 	return result;
 }
+
+
+/** Sends a request to a RADIUS server and waits for the reply
+ *
+ * @param rh a handle to parsed configuration
+ * @param data a pointer to a SEND_DATA structure
+ * @param msg must be an array of %PW_MAX_MSG_SIZE or NULL; will contain the concatenation of
+ *	any %PW_REPLY_MESSAGE received.
+ * @param type must be %AUTH or %ACCT
+ * @return OK_RC (0) on success, TIMEOUT_RC on timeout REJECT_RC on acess reject, or negative
+ *	on failure as return value.
+ */
+int rc_send_server(rc_handle * rh, SEND_DATA * data, char *msg, rc_type type)
+{
+	return rc_send_server_ctx(rh, NULL, data, msg, type);
+}

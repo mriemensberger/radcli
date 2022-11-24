@@ -1,3 +1,16 @@
+/*
+ * Copyright (C) 1995,1996,1997 Lars Fenneberg
+ *
+ * Copyright 1992 Livingston Enterprises, Inc.
+ *
+ * Copyright 1992,1993, 1994,1995 The Regents of the University of Michigan
+ * and Merit Network, Inc. All Rights Reserved
+ *
+ * See the file COPYRIGHT for the respective terms and conditions.
+ * If the file is missing contact me at lf@elemental.net
+ * and I'll send you a copy.
+ *
+ */
 #include <includes.h>
 #include "rc-md5.h"
 #include "rc-hmac.h"
@@ -6,6 +19,7 @@
 # include <gnutls/gnutls.h>
 # include <gnutls/crypto.h>
 #endif
+
 
 /**
  * @defgroup radcli-api Main API
@@ -192,20 +206,6 @@ populate_ctx(RC_AAA_CTX ** ctx, char secret[MAX_SECRET_LENGTH + 1],
 	return OK_RC;
 }
 
-/** Sends a request to a RADIUS server and waits for the reply
- *
- * @param rh a handle to parsed configuration
- * @param data a pointer to a SEND_DATA structure
- * @param msg must be an array of %PW_MAX_MSG_SIZE or NULL; will contain the concatenation of
- *	any %PW_REPLY_MESSAGE received.
- * @param type must be %AUTH or %ACCT
- * @return OK_RC (0) on success, TIMEOUT_RC on timeout REJECT_RC on acess reject, or negative
- *	on failure as return value.
- */
-int rc_send_server(rc_handle * rh, SEND_DATA * data, char *msg, rc_type type)
-{
-	return rc_send_server_ctx(rh, NULL, data, msg, type);
-}
 
 /** Verify items in returned packet
  *

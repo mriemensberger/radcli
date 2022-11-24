@@ -25,6 +25,15 @@ RADCLI_@LIBMAJOR@
 	rc_auth_proxy;
 	rc_acct;
 	rc_acct_proxy;
+	rc_async_prepare_multihandle;
+	rc_async_aaa_ctx_server;
+	rc_async_acct;
+	rc_async_auth;
+	rc_async_free_multihandle;
+	rc_async_get_pollfds;
+	rc_async_get_next_response;
+	rc_async_cleanup_response;
+	rc_async_process;
 	rc_check;
 	rc_aaa;
 	rc_aaa_ctx;

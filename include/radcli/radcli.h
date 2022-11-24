@@ -6,6 +6,8 @@
  * Copyright 1992,1993, 1994,1995 The Regents of the University of Michigan
  * and Merit Network, Inc. All Rights Reserved
  *
+ * Copyright (C) 2022 Cadami GmbH info@cadami.net
+ *
  * See the file COPYRIGHT for the respective terms and conditions.
  * If the file is missing contact me at lf@elemental.net
  * and I'll send you a copy.
@@ -25,6 +27,8 @@
 /* #include	<inttypes.h> */
 #include	<stdio.h>
 #include	<time.h>
+
+#include <poll.h>
 
 /* for struct in6_addr */
 #include	<netinet/in.h>
@@ -498,6 +502,7 @@ typedef struct send_data /* Used to pass information to sendserver() function */
 
 #define AUTH_VECTOR_LEN		16
 
+
 struct rc_aaa_ctx_st;
 typedef struct rc_aaa_ctx_st RC_AAA_CTX;
 
@@ -672,6 +677,55 @@ int rc_send_server (rc_handle *rh, SEND_DATA *data, char *msg,
 void rc_aaa_ctx_free(RC_AAA_CTX *ctx);
 const char *rc_aaa_ctx_get_secret(RC_AAA_CTX *ctx);
 const void *rc_aaa_ctx_get_vector(RC_AAA_CTX *ctx);
+
+
+/* Async utility from sendserver_async.c and buildreq_async.c */
+
+/* After a request has been answered (or after it has failed), this struct will
+ * be passed to the user to provide the answer and / or error code. */
+struct rc_async_response {
+	int result; /* the request's result code. Identical to what the
+		       synchronous rc_send_server_ctx() would return. */
+	int sockfd;
+	char *msg;
+	VALUE_PAIR *rcvpairs;
+	RC_AAA_CTX **ctx;
+};
+
+
+struct rc_async_multihandle {
+	unsigned enqueued_entries;
+	unsigned ready_entries;
+	struct rc_async_handle_list_member *begin;
+};
+
+
+/* Async handle-creation, state checking and polling related functions from
+ * sendserver_async.c */
+struct rc_async_multihandle * rc_async_prepare_multihandle(void);
+void rc_async_free_multihandle(struct rc_async_multihandle *mhdl);
+int rc_async_send_server_ctx(struct rc_async_multihandle *mhdl, rc_handle *rh,
+	RC_AAA_CTX **ctx, SEND_DATA *data, rc_type type);
+int rc_async_process(struct rc_async_multihandle *mhdl, struct pollfd *pollfds,
+	unsigned pollfds_len);
+int rc_async_get_next_response(struct rc_async_multihandle *mhdl,
+	struct rc_async_response *resp);
+int rc_async_get_pollfds(struct rc_async_multihandle *mhdl,
+	struct pollfd *pollfds, unsigned pollfds_len);
+
+/* Functions for creating / sending async requests, from buildreq_async.c */
+int rc_async_aaa_ctx_server(struct rc_async_multihandle *mhdl, rc_handle *rh,
+	RC_AAA_CTX **ctx, SERVER *aaaserver, rc_type type, uint32_t nas_port,
+	VALUE_PAIR *send, int add_nas_port, rc_standard_codes request_type);
+int rc_async_auth(struct rc_async_multihandle *mhdl, rc_handle *rh,
+	uint32_t nas_port, VALUE_PAIR *send);
+int rc_async_acct(struct rc_async_multihandle *mhdl, rc_handle *rh,
+	uint32_t nas_port, VALUE_PAIR *send);
+
+/* Clean up the response struct. */
+void rc_async_cleanup_response(struct rc_async_response *resp);
+
+
 
 /* obsolete functions */
 #define _RADCLI_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
