@@ -53,7 +53,7 @@ dnf install -y autoconf libtool automake nettle-devel gnutls-devel gettext-devel
 
 Required dependencies (Debian pkg):
 ```
-apt-get install -y autoconf libtool automake nettle-dev libgnutls28-dev abi-compliance-checker
+apt-get install -y autoconf libtool automake nettle-dev libgnutls28-dev abi-compliance-checker pkg-config
 ```
 
 ## Contributing/Submitting pull requests
